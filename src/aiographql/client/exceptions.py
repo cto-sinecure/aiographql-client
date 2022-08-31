@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 import graphql
-import ujson as json
+import orjson as json
 
 if TYPE_CHECKING:
     from aiographql.client import GraphQLResponse

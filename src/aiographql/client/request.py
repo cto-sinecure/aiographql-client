@@ -4,7 +4,7 @@ from copy import deepcopy
 from dataclasses import InitVar, asdict, dataclass, field, replace
 from typing import Any, Dict, Optional
 
-import ujson as json
+import orjson as json
 
 
 @dataclass(frozen=True)
