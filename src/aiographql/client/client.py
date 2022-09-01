@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Iterable, Mapping, Optional, Union
 
 import aiohttp
+from aiohttp.web import HTTPTooManyRequests
 import graphql
 from cafeteria.asyncio.callbacks import CallbackRegistry, CallbackType
 
@@ -204,6 +205,8 @@ class GraphQLClient:
         async with session.request(
             method=method, url=self.endpoint, headers=request.headers, **kwargs
         ) as resp:
+            if resp.status == 429:
+                raise HTTPTooManyRequests(response)
             body = await resp.json()
             response = GraphQLResponse(request=request, json=body)
 
