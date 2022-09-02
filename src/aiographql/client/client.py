@@ -206,7 +206,7 @@ class GraphQLClient:
             method=method, url=self.endpoint, headers=request.headers, **kwargs
         ) as resp:
             if resp.status == 429:
-                raise HTTPTooManyRequests(response)
+                raise HTTPTooManyRequests()
             body = await resp.json()
             response = GraphQLResponse(request=request, json=body)
 
