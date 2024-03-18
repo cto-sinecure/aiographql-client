@@ -60,7 +60,7 @@ def subscription_query(city_name):
             id
           }}
         }}
-    """
+    """  # noqa: B907
 
 
 @pytest.fixture
@@ -110,14 +110,14 @@ async def mutation_city(client, headers, city_name):
             affected_rows
           }}
         }}
-    """
+    """  # noqa: B907
     delete_mutation = f"""
         mutation {{
           delete_city(where: {{name: {{_eq: "{city_name}"}}}}) {{
             affected_rows
           }}
         }}
-        """
+        """  # noqa: B907
     request = GraphQLRequest(query=delete_mutation)
     _ = await client.query(request=request, headers=headers)
 

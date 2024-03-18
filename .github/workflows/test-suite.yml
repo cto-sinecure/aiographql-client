@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [Ubuntu]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     services:
       postgres:
         image: docker.io/postgres:9.6-alpine
@@ -37,37 +37,24 @@ jobs:
           - 8080:8080
         options: --restart on-failure
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Start test container (apollo-server-v2)
         shell: bash
         run: docker-compose up -d apollo-server-v2
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Get full Python version
-        id: full-python-version
-        shell: bash
-        run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))")
-
-      - name: Install poetry, tox
-        shell: bash
-        run: |
-          python -m pip install --disable-pip-version-check poetry tox
-
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: cache
-        with:
-          path: .tox
-          key: tox-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          cache: poetry
 
       - name: Setup test environment
         shell: bash
-        run: tox -e py --notest
+        run: poetry install
 
       - name: Wait for hasura
         shell: bash
@@ -79,6 +66,6 @@ jobs:
       - name: Execute test suite
         shell: bash
         run: |
-          tox -e py -- \
+          poetry run pytest \
             --server-world-db="http://127.0.0.1:${{ job.services.hasura.ports[8080] }}/v1/graphql" \
             --server-apollo-v2="http://127.0.0.1:4000/graphql"
